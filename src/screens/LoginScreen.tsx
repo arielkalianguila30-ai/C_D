@@ -1,0 +1,196 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from 'react-native';
+import { colors } from '../styles/colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { WalletLogo } from '../components/WalletLogo';
+
+interface LoginScreenProps {
+  navigation: any;
+}
+
+export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = () => {
+    if (email && password) {
+      (async () => {
+        try {
+          const stored = await AsyncStorage.getItem('@cards_v1');
+          const arr = stored ? JSON.parse(stored) : [];
+          if (arr.length > 0) {
+            navigation.replace('Cards');
+          } else {
+            navigation.replace('AddCard');
+          }
+        } catch (err) {
+          console.error('Erro ao verificar cartões', err);
+          navigation.replace('AddCard');
+        }
+      })();
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.headerContainer}>
+          <View style={styles.logo}>
+            <WalletLogo width={80} height={80} />
+          </View>
+          <Text style={styles.title}>Entrar</Text>
+          <Text style={styles.subtitle}>Acesse sua conta Namitech </Text>
+        </View>
+
+        <View style={styles.formContainer}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>E-mail</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="insira o seu email"
+              placeholderTextColor={colors.lightText}
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+              editable={true}
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Senha</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="insira a sua senha"
+              placeholderTextColor={colors.lightText}
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+          </View>
+
+          <TouchableOpacity>
+            <Text style={styles.forgotPassword}>Esqueceu a senha?</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Entrar</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.signupContainer}>
+          <Text style={styles.signupText}>Não tem conta? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+            <Text style={styles.signupLink}>Criar agora</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingTop: 40,
+    paddingBottom: 20,
+    justifyContent: 'space-between',
+  },
+  headerContainer: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    borderRadius: 20,
+    backgroundColor: colors.secondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  logoText: {
+    fontSize: 40,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: colors.darkBlue,
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: colors.lightText,
+  },
+  formContainer: {
+    marginBottom: 24,
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.darkBlue,
+    marginBottom: 8,
+  },
+  input: {
+    height: 50,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 25,
+    paddingHorizontal: 16,
+    fontSize: 14,
+    color: colors.darkText,
+    backgroundColor: colors.background,
+  },
+  forgotPassword: {
+    color: colors.secondary,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 24,
+  },
+  loginButton: {
+    height: 50,
+    backgroundColor: colors.secondary,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  signupContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  signupText: {
+    fontSize: 14,
+    color: colors.lightText,
+  },
+  signupLink: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.secondary,
+  },
+});
